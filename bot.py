@@ -12,7 +12,7 @@ API_ID = 25851310
 API_HASH = "6e623f9734f999d0ca50f8b9d81247ae"
 BOT_TOKEN = "8100386629:AAGr3hwt9EoeGRRiubIJwIYOSJ1qLKtB9h8"
 SOURCE_CHANNEL = "@testmytest138"
-WEBHOOK_URL = "https://hook.eu1.make.com/your_webhook"  # Ваш webhook
+WEBHOOK_URL = "https://hook.us1.make.com/1u09zg5rt4p6e2bu8j44rk2niktvrjv1"  # Ваш webhook
 
 # Порт для API сервера
 API_PORT = int(os.environ.get('PORT', 8080))
