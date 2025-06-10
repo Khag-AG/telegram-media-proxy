@@ -185,12 +185,45 @@ async def get_file_info(event):
 async def upload_to_hosting(file_bytes, extension):
     """Загружает файл на хостинг"""
     async with aiohttp.ClientSession() as session:
+        # Добавляем headers чтобы выглядеть как браузер
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
         data = aiohttp.FormData()
         data.add_field('file', file_bytes, filename=f'file.{extension}')
         
-        response = await session.post('https://0x0.st', data=data)
-        file_url = await response.text()
-        return file_url.strip()
+        # Пробуем 0x0.st с правильными headers
+        try:
+            response = await session.post('https://0x0.st', data=data, headers=headers)
+            file_url = await response.text()
+            file_url = file_url.strip()
+            
+            if file_url.startswith('http'):
+                return file_url
+        except:
+            pass
+        
+        # Если не работает, используем file.io
+        print("0x0.st не работает, использую file.io...")
+        form_data = aiohttp.FormData()
+        form_data.add_field('file', file_bytes, filename=f'file.{extension}')
+        
+        response = await session.post('https://file.io', data=form_data)
+        result = await response.json()
+        
+        if result.get('success'):
+            return result.get('link')
+        
+        # Резервный вариант - litterbox.catbox.moe
+        print("Пробую catbox.moe...")
+        data = aiohttp.FormData()
+        data.add_field('reqtype', 'fileupload')
+        data.add_field('time', '72h')  # Хранить 72 часа
+        data.add_field('fileToUpload', file_bytes, filename=f'file.{extension}')
+        
+        response = await session.post('https://litterbox.catbox.moe/resources/internals/api.php', data=data)
+        return await response.text()
 
 async def send_to_webhook(data):
     """Отправляет данные в Make.com webhook"""
